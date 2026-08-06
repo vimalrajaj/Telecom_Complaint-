@@ -1,0 +1,11 @@
+-- Seed SQL file for telecom_complaints
+-- 
+-- IMPORTANT: Passwords need to be bcrypt hashed, which is not supported directly in SQL.
+-- Please run the Node.js script instead for correct seeding with hashed passwords:
+-- 
+-- node src/database/seedRunner.js
+--
+-- DO NOT RUN THIS FILE DIRECTLY UNLESS YOU ARE MANUALLY INSERTING PRE-HASHED PASSWORDS.
+
+-- Example manual inserts (NOT RECOMMENDED):
+-- INSERT INTO users (name, email, password, role) VALUES ('Admin User', 'admin@telecom.com', '$2b$10$8KzQo8KZQE5Z5Z5Z5Z5Z5OqKQx5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z5Z', 'ADMIN');
