@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "jsx": "preserve",
+    "outDir": "./src_js",
+    "rootDir": "./src",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": false,
+    "moduleResolution": "node"
+  },
+  "include": ["src/**/*"]
+}
