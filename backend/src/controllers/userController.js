@@ -19,4 +19,13 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
-module.exports = { getProfile, updateProfile };
+const getEngineers = async (req, res, next) => {
+  try {
+    const engineers = await userService.getEngineers();
+    return sendSuccess(res, 200, 'Engineers retrieved successfully.', engineers);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getProfile, updateProfile, getEngineers };

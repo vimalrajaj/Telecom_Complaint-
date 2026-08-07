@@ -1,13 +1,7 @@
-export const COMPLAINT_CATEGORIES = [
-  "Internet", "Voice", "Broadband", "OTT", "Billing", "Hardware", "SMS", "Mobile",
-];
+export const COMPLAINT_STATUSES = ['OPEN', 'ASSIGNED', 'ACCEPTED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED'];
 
-export const COMPLAINT_STATUSES = [
-  "Open", "In Progress", "Assigned", "Resolved", "Escalated",
-];
+export const COMPLAINT_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
 
-export const COMPLAINT_PRIORITIES = [
-  "Critical", "High", "Medium", "Low",
-];
+export const ASSIGNMENT_STATUSES = ['ASSIGNED', 'ACCEPTED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED'];
 
-export const REGIONS = ["North", "South", "East", "West"];
+export const ROLES = { CUSTOMER: 'CUSTOMER', ENGINEER: 'ENGINEER', ADMIN: 'ADMIN' };

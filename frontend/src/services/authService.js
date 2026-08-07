@@ -1,5 +1,6 @@
-import { api } from './api';
+import api from './api';
 
 export const authService = {
-  // Add auth logic here
+  login: (email, password) => api.post('/auth/login', { email, password }),
+  register: (name, email, password, phone) => api.post('/auth/register', { name, email, password, phone }),
 };

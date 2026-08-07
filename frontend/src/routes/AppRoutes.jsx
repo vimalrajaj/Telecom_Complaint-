@@ -18,15 +18,16 @@ import Profile from "@/pages/Profile/Profile";
 import EditProfile from "@/pages/Profile/EditProfile";
 
 function ProtectedRoute({ component: Component, ...rest }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       setLocation("/login");
     }
-  }, [isAuthenticated, setLocation]);
+  }, [isAuthenticated, loading, setLocation]);
 
+  if (loading) return <div className="flex h-screen items-center justify-center text-slate-400 text-sm">Loading...</div>;
   if (!isAuthenticated) return null;
 
   return (
@@ -37,14 +38,14 @@ function ProtectedRoute({ component: Component, ...rest }) {
 }
 
 export default function AppRoutes() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const [location, setLocation] = useLocation();
 
   useEffect(() => {
-    if (location === "/") {
+    if (!loading && location === "/") {
       setLocation(isAuthenticated ? "/dashboard" : "/login");
     }
-  }, [location, isAuthenticated, setLocation]);
+  }, [location, isAuthenticated, loading, setLocation]);
 
   return (
     <Switch>

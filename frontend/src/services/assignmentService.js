@@ -1,5 +1,8 @@
-import { api } from './api';
+import api from './api';
 
 export const assignmentService = {
-  // Add assignment logic here
+  getAll: () => api.get('/assignments'),
+  getMine: () => api.get('/assignments/me'),
+  create: (complaint_id, engineer_id) => api.post('/assignments', { complaint_id, engineer_id }),
+  updateStatus: (id, status) => api.put(`/assignments/${id}`, { status }),
 };

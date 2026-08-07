@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { ArrowLeft, Save } from "lucide-react";
-import { COMPLAINT_CATEGORIES, COMPLAINT_PRIORITIES, REGIONS } from "@/utils/constants";
+import { COMPLAINT_PRIORITIES } from "@/utils/constants";
+import { complaintService } from "@/services/complaintService";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
@@ -9,13 +10,23 @@ import Input from "@/components/Input";
 export default function CreateComplaint() {
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({ title: "", description: "", priority: "MEDIUM" });
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await complaintService.create(form);
       setLocation("/complaints");
-    }, 800);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -31,75 +42,34 @@ export default function CreateComplaint() {
 
       <form onSubmit={handleSubmit}>
         <Card className="p-6 md:p-8">
-          <div className="space-y-8">
+          {error && <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
+          <div className="space-y-5">
             <div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">Issue Details</h3>
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">
-                    Title <span className="text-red-500">*</span>
-                  </label>
-                  <Input required placeholder="Short summary of the issue..." />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">
-                    Description <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    required
-                    rows={4}
-                    className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
-                    placeholder="Detailed explanation of the issue..."
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">
-                      Category <span className="text-red-500">*</span>
-                    </label>
-                    <select required className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:ring-2 focus:ring-indigo-600">
-                      <option value="">Select a category</option>
-                      {COMPLAINT_CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">
-                      Priority <span className="text-red-500">*</span>
-                    </label>
-                    <select required className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:ring-2 focus:ring-indigo-600">
-                      <option value="">Select priority</option>
-                      {COMPLAINT_PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
-                    </select>
-                  </div>
-                </div>
-              </div>
+              <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">Title <span className="text-red-500">*</span></label>
+              <Input name="title" required placeholder="Short summary of the issue..." value={form.title} onChange={handleChange} />
             </div>
-
             <div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">Customer Details</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">
-                    Customer Name <span className="text-red-500">*</span>
-                  </label>
-                  <Input required placeholder="E.g. Aarav Sharma" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">
-                    Customer Phone <span className="text-red-500">*</span>
-                  </label>
-                  <Input required type="tel" placeholder="+91 00000 00000" />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">
-                    Region <span className="text-red-500">*</span>
-                  </label>
-                  <select required className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:ring-2 focus:ring-indigo-600">
-                    <option value="">Select region</option>
-                    {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
-                  </select>
-                </div>
-              </div>
+              <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">Description <span className="text-red-500">*</span></label>
+              <textarea
+                name="description"
+                required
+                rows={5}
+                className="w-full rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
+                placeholder="Detailed explanation of the issue (min. 20 characters)..."
+                value={form.description}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">Priority</label>
+              <select
+                name="priority"
+                className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:ring-2 focus:ring-indigo-600"
+                value={form.priority}
+                onChange={handleChange}
+              >
+                {COMPLAINT_PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
+              </select>
             </div>
           </div>
 

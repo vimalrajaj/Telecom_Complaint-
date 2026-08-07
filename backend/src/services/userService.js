@@ -16,7 +16,6 @@ const getProfile = async (userId) => {
 };
 
 const updateProfile = async (userId, updateData) => {
-  // Don't allow role changes via profile update
   delete updateData.role;
 
   if (updateData.password) {
@@ -32,4 +31,8 @@ const updateProfile = async (userId, updateData) => {
   return user;
 };
 
-module.exports = { getProfile, updateProfile };
+const getEngineers = async () => {
+  return await userRepository.findEngineers();
+};
+
+module.exports = { getProfile, updateProfile, getEngineers };

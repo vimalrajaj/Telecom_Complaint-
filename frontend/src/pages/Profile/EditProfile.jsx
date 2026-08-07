@@ -1,24 +1,42 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/context/AuthContext";
+import { userService } from "@/services/userService";
 import Card from "@/components/Card";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { ArrowLeft, Save } from "lucide-react";
 
 export default function EditProfile() {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({
+    name: user?.name || "",
+    phone: user?.phone || "",
+    password: "",
+  });
 
   if (!user) return null;
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const payload = { name: form.name, phone: form.phone };
+      if (form.password) payload.password = form.password;
+      const res = await userService.updateProfile(payload);
+      setUser(res.data);
       setLocation("/profile");
-    }, 800);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,51 +52,40 @@ export default function EditProfile() {
 
       <form onSubmit={handleSubmit}>
         <Card className="p-6 md:p-8">
+          {error && <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
           <div className="space-y-8">
             <div>
               <h3 className="text-lg font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">Personal Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">Full Name</label>
-                  <Input required defaultValue={user.name} />
+                  <Input name="name" required value={form.name} onChange={handleChange} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">Phone Number</label>
-                  <Input required type="tel" defaultValue={user.phone} />
+                  <Input name="phone" type="tel" value={form.phone} onChange={handleChange} placeholder="10 digits" />
                 </div>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">Work Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">Department</label>
-                  <Input required defaultValue={user.department} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">Region</label>
-                  <select required defaultValue={user.region} className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:ring-2 focus:ring-indigo-600">
-                    <option value="North">North</option>
-                    <option value="South">South</option>
-                    <option value="East">East</option>
-                    <option value="West">West</option>
-                  </select>
-                </div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">Change Password</h3>
+              <div>
+                <label className="block text-sm font-medium leading-6 text-slate-900 mb-1">New Password <span className="text-slate-400 font-normal">(leave blank to keep current)</span></label>
+                <Input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Min. 8 characters" />
               </div>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold text-slate-900 mb-4 pb-2 border-b border-slate-100">Read-Only Fields</h3>
-              <p className="text-sm text-slate-500 mb-4">Contact your IT administrator to change these details.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-sm font-medium leading-6 text-slate-700 mb-1">Email Address</label>
-                  <Input disabled defaultValue={user.email} className="bg-slate-50 cursor-not-allowed" />
+                  <Input disabled value={user.email} className="bg-slate-50 cursor-not-allowed" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium leading-6 text-slate-700 mb-1">Role</label>
-                  <Input disabled defaultValue={user.role} className="bg-slate-50 cursor-not-allowed" />
+                  <Input disabled value={user.role} className="bg-slate-50 cursor-not-allowed" />
                 </div>
               </div>
             </div>

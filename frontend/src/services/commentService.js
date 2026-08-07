@@ -1,5 +1,6 @@
-import { api } from './api';
+import api from './api';
 
 export const commentService = {
-  // Add comment logic here
+  getAll: (complaintId) => api.get(`/complaints/${complaintId}/comments`),
+  add: (complaintId, message) => api.post(`/complaints/${complaintId}/comments`, { message }),
 };

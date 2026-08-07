@@ -82,9 +82,16 @@ const updateAssignment = async (assignmentId, status, engineerId) => {
   // Update assignment status
   await assignmentRepository.updateStatus(assignmentId, status);
 
-  // If resolved, also update complaint status
-  if (status === ASSIGNMENT_STATUS.RESOLVED) {
-    await complaintRepository.updateStatus(assignment.complaint_id, COMPLAINT_STATUS.RESOLVED);
+  // Sync complaint status with assignment status
+  const complaintStatusMap = {
+    [ASSIGNMENT_STATUS.ACCEPTED]: COMPLAINT_STATUS.ACCEPTED,
+    [ASSIGNMENT_STATUS.IN_PROGRESS]: COMPLAINT_STATUS.IN_PROGRESS,
+    [ASSIGNMENT_STATUS.RESOLVED]: COMPLAINT_STATUS.RESOLVED,
+    [ASSIGNMENT_STATUS.REJECTED]: COMPLAINT_STATUS.REJECTED,
+  };
+
+  if (complaintStatusMap[status]) {
+    await complaintRepository.updateStatus(assignment.complaint_id, complaintStatusMap[status]);
   }
 
   const updatedAssignment = await assignmentRepository.findById(assignmentId);

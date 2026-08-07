@@ -1,5 +1,7 @@
-import { api } from './api';
+import api from './api';
 
 export const userService = {
-  // Add user logic here
+  getProfile: () => api.get('/users/profile'),
+  updateProfile: (data) => api.put('/users/profile', data),
+  getEngineers: () => api.get('/users/engineers'),
 };
